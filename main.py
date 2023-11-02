@@ -17,6 +17,7 @@ data_train = data.iloc[:8000].copy()
 data_test = data.iloc[8000:].copy()
 data_train.drop("Date/Time", axis=1, inplace=True)
 data_test.drop("Date/Time", axis=1, inplace=True)
+names = data_train.columns
 
 scaler = StandardScaler()
 data_train = scaler.fit_transform(data_train)
@@ -63,20 +64,23 @@ train_prediction = lstm_net.predict(train_sequences)
 
 mse_train = np.mean((train_prediction - train_answer_sequences) ** 2)
 print("Mse train: ", mse_train)
+print("Rmse train: ", np.sqrt(mse_train))
 
 test_predict = lstm_net.predict(test_sequences)
 mse_test = np.mean((test_predict - test_answer_sequences) ** 2)
 print("Mse test: ", mse_test)
-
+print("Rmse train: ", np.sqrt(mse_test))
 
 for i in range(0, 10):
     fig, axes = plt.subplots(3, 2)
+    fig.tight_layout(pad=2.0)
 
     sequence = test_answer_sequences[i * 50]
     predicted_sequence = test_predict[i * 50]
 
     for j in range(0, 2):
         for k in range(0, 3):
+            axes[k][j].set_title(names[j * 3 + k])
             axes[k][j].plot(sequence[:, j * 3 + k], "b")
             axes[k][j].plot(predicted_sequence[:, j * 3 + k], "r")
 
