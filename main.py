@@ -9,7 +9,16 @@ import matplotlib.pyplot as plt
 
 # Data read
 data = pd.read_csv("Project1WeatherDataset.csv")
+
+"""
+Removing the "Weather" column because it describes the weather based on other columns that I am trying to predict.
+Similarly, the "Dew Point Temp_C" and "Rel Hum_%" columns have been removed,
+as they depend heavily on temperature and atmospheric pressure.
+"""
+
 data.drop("Weather", axis=1, inplace=True)
+data.drop("Dew Point Temp_C", axis=1, inplace=True)
+data.drop("Rel Hum_%", axis=1, inplace=True)
 data["Date/Time"] = pd.to_datetime(data["Date/Time"])
 
 # Data split
@@ -19,6 +28,7 @@ data_train.drop("Date/Time", axis=1, inplace=True)
 data_test.drop("Date/Time", axis=1, inplace=True)
 names = data_train.columns
 
+# Scaling data
 scaler = StandardScaler()
 data_train = scaler.fit_transform(data_train)
 data_test = scaler.transform(data_test)
@@ -37,24 +47,23 @@ test_answer_sequences = np.array([data_test[i:i + hours_future] for i in range(h
 
 # Model
 lstm_net = tf.keras.Sequential()
-lstm_net.add(tf.keras.layers.InputLayer(input_shape=(72, 6)))
-lstm_net.add(tf.keras.layers.LSTM(128, activation="relu", return_sequences=True))
-lstm_net.add(tf.keras.layers.Dropout(0.1))
-lstm_net.add(tf.keras.layers.LSTM(64, activation="relu"))
+lstm_net.add(tf.keras.layers.InputLayer(input_shape=(72, 4)))
+lstm_net.add(tf.keras.layers.LSTM(100, activation="relu", return_sequences=True))
+lstm_net.add(tf.keras.layers.LSTM(50, activation="relu"))
 
-lstm_net.add(tf.keras.layers.Dense(128))
-lstm_net.add(tf.keras.layers.BatchNormalization())
+lstm_net.add(tf.keras.layers.Dense(64))
+lstm_net.add(tf.keras.layers.BatchNormaliation())
 lstm_net.add(tf.keras.layers.Activation("relu"))
 
-lstm_net.add(tf.keras.layers.Dense(144))
-lstm_net.add(tf.keras.layers.Reshape([24, 6]))
+lstm_net.add(tf.keras.layers.Dense(96))
+lstm_net.add(tf.keras.layers.Reshape([24, 4]))
 
 
 lstm_net.compile(optimizer="adam", loss=tf.keras.losses.MeanSquaredError(), metrics=[tf.keras.metrics.MeanSquaredError()])
 lstm_net.summary()
 
 # Training
-hist = lstm_net.fit(train_sequences, train_answer_sequences, batch_size=30, epochs=15)
+hist = lstm_net.fit(train_sequences, train_answer_sequences, batch_size=30, epochs=13)
 
 plt.plot(hist.history["loss"])
 plt.savefig("loss.png")
@@ -72,17 +81,18 @@ print("Mse test: ", mse_test)
 print("Rmse train: ", np.sqrt(mse_test))
 
 for i in range(0, 10):
-    fig, axes = plt.subplots(3, 2)
+    fig, axes = plt.subplots(2, 2)
     fig.tight_layout(pad=2.0)
 
     sequence = test_answer_sequences[i * 50]
     predicted_sequence = test_predict[i * 50]
 
     for j in range(0, 2):
-        for k in range(0, 3):
-            axes[k][j].set_title(names[j * 3 + k])
-            axes[k][j].plot(sequence[:, j * 3 + k], "b")
-            axes[k][j].plot(predicted_sequence[:, j * 3 + k], "r")
+        for k in range(0, 2):
+            axes[k][j].set_title(names[j * 2 + k])
+            axes[k][j].plot(sequence[:, j * 2 + k], "b", label="True")
+            axes[k][j].plot(predicted_sequence[:, j * 2 + k], "r", label="Predicted")
+            axes[k][j].legend()
 
     fig.savefig("sample_" + str(i) + ".png")
     fig.clf()
