@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+import os
 from sklearn.preprocessing import StandardScaler
 import matplotlib
 matplotlib.use('TkAgg')
@@ -52,21 +53,30 @@ lstm_net.add(tf.keras.layers.LSTM(100, activation="relu", return_sequences=True)
 lstm_net.add(tf.keras.layers.LSTM(50, activation="relu"))
 
 lstm_net.add(tf.keras.layers.Dense(64))
-lstm_net.add(tf.keras.layers.BatchNormaliation())
+lstm_net.add(tf.keras.layers.BatchNormalization())
 lstm_net.add(tf.keras.layers.Activation("relu"))
 
 lstm_net.add(tf.keras.layers.Dense(96))
 lstm_net.add(tf.keras.layers.Reshape([24, 4]))
 
 
-lstm_net.compile(optimizer="adam", loss=tf.keras.losses.MeanSquaredError(), metrics=[tf.keras.metrics.MeanSquaredError()])
+lstm_net.compile(optimizer="adam", loss=tf.keras.losses.MeanSquaredError(), metrics=[tf.keras.metrics.RootMeanSquaredError()])
 lstm_net.summary()
 
 # Training
 hist = lstm_net.fit(train_sequences, train_answer_sequences, batch_size=30, epochs=13)
 
+if not os.path.exists(".\\images"):
+    os.makedirs(".\\images")
+
 plt.plot(hist.history["loss"])
-plt.savefig("loss.png")
+plt.title("Loss over epochs")
+plt.savefig(".\\images\\loss.png")
+plt.clf()
+
+plt.plot(hist.history["root_mean_squared_error"])
+plt.title("RMSE over epochs")
+plt.savefig(".\\images\\RMSE.png")
 plt.clf()
 
 train_prediction = lstm_net.predict(train_sequences)
@@ -94,5 +104,5 @@ for i in range(0, 10):
             axes[k][j].plot(predicted_sequence[:, j * 2 + k], "r", label="Predicted")
             axes[k][j].legend()
 
-    fig.savefig("sample_" + str(i) + ".png")
+    fig.savefig(".\\images\\sample_" + str(i) + ".png")
     fig.clf()
