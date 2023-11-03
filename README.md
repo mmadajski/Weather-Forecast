@@ -80,6 +80,7 @@ In addition, looking at the sample graphs of the model's predictions,
 one can see that the model seems to struggle mainly with predicting
 visibility and wind speed, which can be quite random and therefore difficult to predict. 
 
+![image](https://github.com/mmadajski/Weather-Forecast/blob/main/images/sample_1.png?raw=true)
 ---
 
 ## Requirements
