@@ -1,11 +1,10 @@
 # Weather Forecasting with LSTM Neural Network
-
-
+## Project Overview
 This project uses Long Short-Term Memory 
 (LSTM) neural networks implemented in TensorFlow
 to predict weather conditions such as temperature,
 air pressure, visibility,
-and wind speed.
+and wind speed for the next 24 hours.
 
 ---
 
@@ -17,17 +16,6 @@ and wind speed.
 - [Results](#results)
 - [Requirements](#requirements)
 - [Installation](#installation)
-
----
-
-
-## Project Overview
-
-Accurate weather forecasting is a complex
-task that relies on historical data and advanced
-machine learning techniques. In this project, I have
-implemented an LSTM neural network using TensorFlow to predict
-weather conditions for the next 24 hours.
 
 --- 
 
